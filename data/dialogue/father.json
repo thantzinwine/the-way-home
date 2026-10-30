@@ -1,0 +1,46 @@
+{
+  "start": "greet",
+  "nodes": {
+    "greet": {
+      "lines": [
+        {"who": "father", "text": "Mind the road. Every cell of it costs you."},
+        {"who": "ren", "text": "I know."},
+        {"who": "father", "text": "Knowing is not the same as paying."}
+      ],
+      "choices": [
+        {"text": "Ask about the crossing", "goto": "crossing"},
+        {"text": "Ask if there is work", "goto": "work", "if": "not_frozen", "once": "father_work"},
+        {"text": "Say you are leaving", "goto": "leaving"}
+      ]
+    },
+    "crossing": {
+      "lines": [
+        {"who": "father", "text": "Past the crossing the city charges double. Pavement is cheap. Roads are not."},
+        {"who": "ren", "text": "Then I will walk the pavement."},
+        {"who": "father", "text": "Everyone says that until it rains."}
+      ],
+      "goto": "greet"
+    },
+    "work": {
+      "lines": [
+        {"who": "father", "text": "The stall needs crates moved before the light goes."},
+        {"who": "narrator", "text": "You carry them. Your arms ache in a way that feels honest."},
+        {"who": "father", "text": "Fifteen Steps. Do not tell your mother I paid you."}
+      ],
+      "effects": [{"type": "grant_steps", "amount": 15}],
+      "goto": "work_after"
+    },
+    "work_after": {
+      "lines": [
+        {"who": "father", "text": "There is always another crate. That is the whole trick of it."}
+      ]
+    },
+    "leaving": {
+      "lines": [
+        {"who": "father", "text": "Your mother will cry. Do it in the kitchen so she can pretend she is not."},
+        {"who": "ren", "text": "And you?"},
+        {"who": "father", "text": "I will be at the stall. Somebody has to be at the stall."}
+      ]
+    }
+  }
+}

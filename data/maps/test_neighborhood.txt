@@ -1,0 +1,44 @@
+// The Way Home - Milestone 1 test neighbourhood
+// ------------------------------------------------------------------
+// MAP section  : ground tiles.
+// PROPS section: objects placed at the cell they are written on.
+// START        : grid cell Ren spawns on.
+//
+// Ground glyphs: . grass   , flowers   - dirt   _ pavement
+//                = road    x crossing  # wall   ~ water
+// Prop glyphs  : T tree  P pole  C crate  S stall  G sign  H house
+// (a house occupies 3x2 cells around its anchor cell)
+
+START 2,11
+
+MAP
+################
+#..,.........,.#
+#..............#
+#..,........,..#
+#....-....-....#
+________________
+=====x==========
+================
+________________
+#...-......-...#
+#..............#
+#..-........-..#
+#..,........,..#
+################
+
+PROPS
+................
+..T....G....T...
+................
+....H....H......
+......P.........
+.........S....P.
+................
+................
+...T..G.....C...
+................
+....H....H......
+................
+..P..........T..
+................

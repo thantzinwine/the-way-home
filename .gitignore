@@ -1,0 +1,31 @@
+# Godot 4 engine cache / imported assets (regenerated on import)
+.godot/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Mono / C# (if used later)
+.mono/
+data_*/
+mono_crash.*.json
+
+# Exported builds
+*.pck
+*.exe
+*.apk
+*.aab
+*.ipa
+*.zip
+
+# Translations
+*.translation
+
+# Local user settings
+*.cfg.user
+*.user
+
+# Save files live in user:// (not in the project), but ignore any stray local copies
+save_slot_*.json
+photos/

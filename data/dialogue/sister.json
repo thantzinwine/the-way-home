@@ -1,0 +1,58 @@
+{
+  "start": "greet",
+  "nodes": {
+    "greet": {
+      "lines": [
+        {"who": "sister", "text": "Ren! The sign is counting again. Look, the little one on the end is moving."},
+        {"who": "ren", "text": "It counts all the time. You just noticed."},
+        {"who": "sister", "text": "That is what noticing means."}
+      ],
+      "choices": [
+        {"text": "Explain what the sign is for", "goto": "explain"},
+        {"text": "Ask what she wants", "goto": "gift", "once": "sister_gift"},
+        {"text": "Take a photo of her", "goto": "photo"},
+        {"text": "Say goodbye", "goto": "bye"}
+      ]
+    },
+    "explain": {
+      "lines": [
+        {"who": "ren", "text": "It counts the Steps everyone has left. Yours, mine, the whole street's."},
+        {"who": "sister", "text": "What if mine runs out?"},
+        {"who": "ren", "text": "Mine runs out first. That is what older brothers are for."},
+        {"who": "sister", "text": "You are not even that much older."}
+      ],
+      "goto": "greet"
+    },
+    "gift": {
+      "lines": [
+        {"who": "sister", "text": "I saved these for you. Do not tell Mother, she will say I am wasting them."},
+        {"who": "narrator", "text": "Ten Steps, warm from her pocket."},
+        {"who": "ren", "text": "I will keep them somewhere safe."},
+        {"who": "sister", "text": "Keep them where you can reach them, is the point."}
+      ],
+      "effects": [{"type": "grant_steps", "amount": 10}],
+      "goto": "gift_after"
+    },
+    "gift_after": {
+      "lines": [
+        {"who": "sister", "text": "You still owe me a photo. A real one, with the whole street in it."}
+      ]
+    },
+    "photo": {
+      "lines": [
+        {"who": "ren", "text": "Stand by the sign. Not in front of it."},
+        {"who": "narrator", "text": "She stands very still, the way children do when they are being brave."},
+        {"who": "sister", "text": "Do I look like I am not scared?"},
+        {"who": "ren", "text": "You look like the street belongs to you."}
+      ],
+      "goto": "greet"
+    },
+    "bye": {
+      "lines": [
+        {"who": "sister", "text": "Will you take the long road or the short one?"},
+        {"who": "ren", "text": "The one I can afford."},
+        {"who": "sister", "text": "That is not what I asked."}
+      ]
+    }
+  }
+}

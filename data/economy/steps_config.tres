@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StepsConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/economy/steps_config.gd" id="1_config"]
+
+[resource]
+script = ExtResource("1_config")
+starting_steps = 150
+cost_per_cell = 1
+departure_hours = 24
+departure_real_seconds = 180.0
+low_steps_threshold = 20

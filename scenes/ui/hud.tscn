@@ -1,0 +1,150 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_hud"]
+[ext_resource type="Texture2D" path="res://assets/ui/steps_token_placeholder.png" id="2_token"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 14.0
+content_margin_top = 9.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.07, 0.1, 0.09, 0.78)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.82, 0.76, 0.6, 0.28)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frozen"]
+content_margin_left = 18.0
+content_margin_top = 9.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.24, 0.08, 0.06, 0.86)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.86, 0.42, 0.32, 0.55)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="HUD" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_hud")
+wallet_path = NodePath("../Steps")
+player_path = NodePath("../World/Ren")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="StepsPanel" type="PanelContainer" parent="Root"]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 16.0
+offset_right = 18.0
+offset_bottom = 16.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="Root/StepsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 1
+
+[node name="Header" type="HBoxContainer" parent="Root/StepsPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="Token" type="TextureRect" parent="Root/StepsPanel/VBox/Header"]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("2_token")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Root/StepsPanel/VBox/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.84, 0.79, 0.65, 0.9)
+theme_override_font_sizes/font_size = 12
+text = "STEPS"
+
+[node name="ValueRow" type="HBoxContainer" parent="Root/StepsPanel/VBox"]
+layout_mode = 2
+
+[node name="Value" type="Label" parent="Root/StepsPanel/VBox/ValueRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.97, 0.95, 0.86, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.55)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 30
+text = "150"
+
+[node name="CostHint" type="Label" parent="Root/StepsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.79, 0.75, 0.63, 0.62)
+theme_override_font_sizes/font_size = 11
+text = "1 Step per cell"
+
+[node name="FrozenPanel" type="PanelContainer" parent="Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -180.0
+offset_top = 16.0
+offset_right = 180.0
+offset_bottom = 16.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_frozen")
+
+[node name="VBox" type="VBoxContainer" parent="Root/FrozenPanel"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Root/FrozenPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.62, 0.52, 1)
+theme_override_font_sizes/font_size = 17
+text = "FROZEN"
+horizontal_alignment = 1
+
+[node name="Clock" type="Label" parent="Root/FrozenPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.9, 0.82, 0.9)
+theme_override_font_sizes/font_size = 13
+text = "Departure in 24:00:00"
+horizontal_alignment = 1
+
+[node name="Toast" type="Label" parent="Root"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -596.0
+offset_right = 300.0
+offset_bottom = -566.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.98, 0.55, 0.46, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1

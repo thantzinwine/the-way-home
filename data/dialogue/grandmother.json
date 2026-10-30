@@ -1,0 +1,49 @@
+{
+  "start": "greet",
+  "nodes": {
+    "greet": {
+      "lines": [
+        {"who": "grandmother", "text": "Sit. My knees are older than this road."},
+        {"who": "ren", "text": "You should not be out here in the cold."},
+        {"who": "grandmother", "text": "And you should not be standing there with a face like a closed shop."}
+      ],
+      "choices": [
+        {"text": "Ask her about Departure", "goto": "departure"},
+        {"text": "Sit with her a while", "goto": "sit", "once": "grandmother_sit"},
+        {"text": "Say goodbye", "goto": "bye"}
+      ]
+    },
+    "departure": {
+      "lines": [
+        {"who": "grandmother", "text": "They say the body freezes so you have time to finish the sentence."},
+        {"who": "ren", "text": "What sentence?"},
+        {"who": "grandmother", "text": "The one you have been practising your whole life and never said out loud."},
+        {"who": "ren", "text": "And after the day?"},
+        {"who": "grandmother", "text": "Then you are somewhere else, and we keep your chair."}
+      ],
+      "goto": "greet"
+    },
+    "sit": {
+      "lines": [
+        {"who": "narrator", "text": "You sit. She smells of betel and rain."},
+        {"who": "grandmother", "text": "When you were small you counted the tiles to the crossing out loud. One. Two. Three."},
+        {"who": "ren", "text": "I stopped at forty and lost count."},
+        {"who": "grandmother", "text": "You always counted too fast. Here. Tea money."}
+      ],
+      "effects": [{"type": "grant_steps", "amount": 10}],
+      "goto": "sit_after"
+    },
+    "sit_after": {
+      "lines": [
+        {"who": "grandmother", "text": "Do not spend it on the fast lane. The fast lane is for people who have already arrived."}
+      ]
+    },
+    "bye": {
+      "lines": [
+        {"who": "grandmother", "text": "Go on then. And do not look back at the window."},
+        {"who": "ren", "text": "Why not?"},
+        {"who": "grandmother", "text": "Because I will be in it."}
+      ]
+    }
+  }
+}

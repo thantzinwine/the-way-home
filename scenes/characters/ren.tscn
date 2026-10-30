@@ -1,0 +1,39 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="1_player"]
+[ext_resource type="SpriteFrames" path="res://assets/characters/ren/ren_frames.tres" id="2_frames"]
+[ext_resource type="Script" path="res://scripts/movement/grid_mover.gd" id="3_mover"]
+[ext_resource type="Texture2D" path="res://assets/environments/shadow_placeholder.png" id="4_shadow"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_feet"]
+size = Vector2(20, 12)
+
+[node name="Ren" type="CharacterBody2D" groups=["player"]]
+collision_layer = 2
+collision_mask = 1
+motion_mode = 1
+script = ExtResource("1_player")
+
+[node name="Shadow" type="Sprite2D" parent="."]
+position = Vector2(0, -2)
+scale = Vector2(0.58, 0.5)
+texture = ExtResource("4_shadow")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+offset = Vector2(0, -32)
+sprite_frames = ExtResource("2_frames")
+animation = "idle_s"
+autoplay = "idle_s"
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_feet")
+
+[node name="GridMover" type="Node" parent="."]
+script = ExtResource("3_mover")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(0, -28)
+zoom = Vector2(1.75, 1.75)
+position_smoothing_enabled = true
+position_smoothing_speed = 5.0

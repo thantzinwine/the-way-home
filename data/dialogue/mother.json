@@ -1,0 +1,66 @@
+{
+  "start": "greet",
+  "nodes": {
+    "greet": {
+      "lines": [
+        {"who": "mother", "text": "Ren. You are up before the kettle."},
+        {"who": "ren", "text": "I wanted to see the street again."},
+        {"who": "mother", "text": "It has not changed. It never does, and then one morning it has."}
+      ],
+      "choices": [
+        {"text": "Ask her for Steps", "goto": "support", "if": "not_frozen", "once": "mother_gift"},
+        {"text": "Tell her your body has stopped", "goto": "frozen_help", "if": "frozen", "once": "mother_frozen"},
+        {"text": "Ask about the Departure sign", "goto": "sign"},
+        {"text": "Say you have to go", "goto": "bye"}
+      ]
+    },
+    "support": {
+      "lines": [
+        {"who": "mother", "text": "Come here. Not from your father's tin. From mine."},
+        {"who": "mother", "text": "Twenty-five Steps. Enough to cross the road, not enough for the city."},
+        {"who": "ren", "text": "I will pay it back."},
+        {"who": "mother", "text": "You will not. That is not what it is for."}
+      ],
+      "effects": [{"type": "grant_steps", "amount": 25}],
+      "goto": "after_gift"
+    },
+    "after_gift": {
+      "lines": [
+        {"who": "mother", "text": "Walk where people can see you. Not the back lane."}
+      ]
+    },
+    "frozen_help": {
+      "lines": [
+        {"who": "mother", "text": "Ren. Look at me. Look at me."},
+        {"who": "narrator", "text": "She takes your hand. It does not close around hers."},
+        {"who": "mother", "text": "Thirty Steps. Do not waste them standing here."},
+        {"who": "ren", "text": "The clock started."},
+        {"who": "mother", "text": "I know. Move."}
+      ],
+      "effects": [{"type": "grant_steps", "amount": 30}],
+      "goto": "after_frozen"
+    },
+    "after_frozen": {
+      "lines": [
+        {"who": "mother", "text": "If it happens again, come to me before you look at the sky."}
+      ]
+    },
+    "sign": {
+      "lines": [
+        {"who": "ren", "text": "The sign by the crossing is counting again."},
+        {"who": "mother", "text": "It has counted for thirty years. People stop seeing it."},
+        {"who": "ren", "text": "What happens when it reaches zero?"},
+        {"who": "mother", "text": "The body stops. Then you have one day to finish your sentence."},
+        {"who": "mother", "text": "Do not let it finish for you."}
+      ],
+      "goto": "greet"
+    },
+    "bye": {
+      "lines": [
+        {"who": "mother", "text": "Eat something before the road."},
+        {"who": "ren", "text": "I will."},
+        {"who": "mother", "text": "You always say that."}
+      ]
+    }
+  }
+}
