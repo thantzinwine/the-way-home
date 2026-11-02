@@ -1,59 +1,41 @@
-## Draws the walkable grid over the world.
-##
-## Answers the two things a player cannot infer from the art alone:
-##   * exactly which cells an obstacle occupies (red diamonds = blocked),
-##   * which cells can be walked onto (faint outline = walkable).
-## Also flashes the cell that refused a step, so a blocked move is never silent.
-##
-## Toggled with G. The grid itself is drawn at ground level (below the props, so roofs
-## stay clean); the refusal flash is drawn on a child layer above everything.
+## Walkable grid overlay (3D).
 class_name GridOverlay
-extends Node2D
+extends Node3D
 
-const DIAMOND := [
-	Vector2(0, -16), Vector2(32, 0), Vector2(0, 16), Vector2(-32, 0)
-]
 const FLASH_TIME := 0.55
-const WALKABLE_OUTLINE := Color(1, 1, 1, 0.10)
-const BLOCKED_FILL := Color(0.90, 0.28, 0.22, 0.18)
-const BLOCKED_OUTLINE := Color(0.95, 0.42, 0.32, 0.8)
-const PLAYER_OUTLINE := Color(1.0, 0.95, 0.55, 0.9)
 
 @export var map_path: NodePath
 @export var player_path: NodePath
 
-var show_overlay := false
+var show_overlay := true
 
 var _map: MapBuilder
 var _player: PlayerRen
 var _flashes := {}
-var _last_cell := Vector2i(99999, 99999)
-var _flash_layer: Node2D
+var _overlay_root: Node3D
+var _flash_root: Node3D
 
 
 func _ready() -> void:
 	_map = get_node_or_null(map_path) as MapBuilder
 	_player = get_node_or_null(player_path) as PlayerRen
-
-	# Separate canvas item so the "blocked" pulse stays visible even when the cell
-	# sits behind a building.
-	_flash_layer = Node2D.new()
-	_flash_layer.name = "FlashLayer"
-	_flash_layer.z_as_relative = false
-	_flash_layer.z_index = 200
-	_flash_layer.draw.connect(_draw_flashes)
-	add_child(_flash_layer)
+	_overlay_root = Node3D.new()
+	_overlay_root.visible = show_overlay
+	add_child(_overlay_root)
+	_flash_root = Node3D.new()
+	add_child(_flash_root)
 
 
 func toggle() -> void:
 	show_overlay = not show_overlay
-	queue_redraw()
+	_overlay_root.visible = show_overlay
+	if show_overlay:
+		_rebuild_overlay()
 
 
-## Briefly highlight a cell that refused a step.
 func flash(cell: Vector2i) -> void:
 	_flashes[cell] = FLASH_TIME
-	_flash_layer.queue_redraw()
+	_spawn_flash(cell)
 
 
 func flash_count() -> int:
@@ -72,60 +54,51 @@ func blocked_cell_count() -> int:
 
 
 func _process(delta: float) -> void:
-	var redraw := show_overlay
-
 	if not _flashes.is_empty():
 		for cell in _flashes.keys():
 			_flashes[cell] -= delta
 			if _flashes[cell] <= 0.0:
 				_flashes.erase(cell)
-		_flash_layer.queue_redraw()
+	for child in _flash_root.get_children():
+		var t: float = child.get_meta("t", 0.0) - delta
+		if t <= 0.0:
+			child.queue_free()
+		else:
+			child.set_meta("t", t)
+			var mi := child as MeshInstance3D
+			if mi != null and mi.material_override is StandardMaterial3D:
+				(mi.material_override as StandardMaterial3D).albedo_color.a = clampf(t / FLASH_TIME, 0.0, 1.0) * 0.6
 
-	if _player != null and _player.mover.cell != _last_cell:
-		_last_cell = _player.mover.cell
-		redraw = true
 
-	if redraw:
-		queue_redraw()
-
-
-func _draw() -> void:
+func _rebuild_overlay() -> void:
+	for c in _overlay_root.get_children():
+		c.queue_free()
 	if _map == null:
 		return
-	if not show_overlay:
-		return
-
 	for y in _map.height:
 		for x in _map.width:
 			var cell := Vector2i(x, y)
-			var points := _cell_points(cell)
-			if _map.is_walkable(cell):
-				draw_polyline(_closed(points), WALKABLE_OUTLINE, 1.0)
-			else:
-				draw_colored_polygon(points, BLOCKED_FILL)
-				draw_polyline(_closed(points), BLOCKED_OUTLINE, 1.0)
-
+			if not _map.is_walkable(cell):
+				_add_plane(cell, Color(0.9, 0.28, 0.22, 0.35), _overlay_root)
 	if _player != null:
-		draw_polyline(_closed(_cell_points(_player.mover.cell)), PLAYER_OUTLINE, 2.0)
+		_add_plane(_player.mover.cell, Color(1.0, 0.95, 0.55, 0.5), _overlay_root)
 
 
-func _draw_flashes() -> void:
-	for cell in _flashes:
-		var alpha: float = clampf(_flashes[cell] / FLASH_TIME, 0.0, 1.0)
-		var points := _cell_points(cell)
-		_flash_layer.draw_colored_polygon(points, Color(0.95, 0.25, 0.2, 0.34 * alpha))
-		_flash_layer.draw_polyline(_closed(points), Color(1.0, 0.45, 0.35, alpha), 2.5)
+func _add_plane(cell: Vector2i, color: Color, parent: Node3D) -> MeshInstance3D:
+	var mi := MeshInstance3D.new()
+	var pm := PlaneMesh.new()
+	pm.size = Vector2(0.95, 0.95)
+	mi.mesh = pm
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = color
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mi.material_override = mat
+	mi.position = Isometric.grid_to_world(cell) + Vector3(0, 0.02, 0)
+	parent.add_child(mi)
+	return mi
 
 
-func _cell_points(cell: Vector2i) -> PackedVector2Array:
-	var centre := Isometric.grid_to_world(cell)
-	var points := PackedVector2Array()
-	for offset in DIAMOND:
-		points.append(centre + offset)
-	return points
-
-
-func _closed(points: PackedVector2Array) -> PackedVector2Array:
-	var out := points.duplicate()
-	out.append(points[0])
-	return out
+func _spawn_flash(cell: Vector2i) -> void:
+	var mi := _add_plane(cell, Color(0.95, 0.25, 0.2, 0.6), _flash_root)
+	mi.set_meta("t", FLASH_TIME)

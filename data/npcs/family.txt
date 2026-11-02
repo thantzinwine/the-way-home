@@ -1,12 +1,12 @@
 // The Way Home - Chapter 1 family
-// ------------------------------------------------------------------
 // One NPC per line:  id | display name | cell x,y | facing | dialogue file
-//
-// The id also names the art:  assets/characters/<id>/<id>_frames.tres
-//                             assets/characters/<id>/<id>_portrait.png
-// The cell is blocked as soon as the NPC spawns, so nobody can walk through them.
 
-mother      | Daw Mya  | 4,11 | n | res://data/dialogue/mother.json
-father      | U Aung   | 9,7  | w | res://data/dialogue/father.json
-grandmother | Daw Hla  | 4,4  | s | res://data/dialogue/grandmother.json
-sister      | Thiri    | 7,8  | s | res://data/dialogue/sister.json
+mother      | Daw Mya  | 10,8  | n | res://data/dialogue/mother.json
+father      | U Aung   | 20,12 | w | res://data/dialogue/father.json
+grandmother | Daw Hla  | 10,18 | s | res://data/dialogue/grandmother.json
+sister      | Thiri    | 20,20 | s | res://data/dialogue/sister.json
+walker      | Maung    | 24,25 | e | res://data/dialogue/father.json
+walker2     | Saya     | 2,15  | e | res://data/dialogue/mother.json
+walker3     | Ko Min   | 6,10  | e | res://data/dialogue/father.json
+walker4     | Nilar    | 15,2  | s | res://data/dialogue/sister.json
+walker5     | Tun Tun  | 29,2  | w | res://data/dialogue/father.json

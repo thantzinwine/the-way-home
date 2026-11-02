@@ -16,14 +16,14 @@ const NPC_SCENE := preload("res://scenes/npcs/npc.tscn")
 
 var npcs: Array[NPC] = []
 
-var _world: Node2D
+var _world: Node3D
 var _map: MapBuilder
 var _by_id := {}
 
 
 ## Spawns every NPC. Safe to call once, after the map is built.
 func spawn_all() -> void:
-	_world = get_node_or_null(world_path) as Node2D
+	_world = get_node_or_null(world_path) as Node3D
 	_map = get_node_or_null(map_path) as MapBuilder
 	if _world == null or _map == null:
 		push_error("NPCManager: world_path / map_path not set")
@@ -38,10 +38,12 @@ func spawn_all() -> void:
 		var npc := NPC_SCENE.instantiate() as NPC
 		npc.name = "NPC_%s" % str(definition["id"]).capitalize()
 		_world.add_child(npc)
+		npc.map = _map
 		if not npc.setup(definition):
 			npc.queue_free()
 			continue
-		_map.block_cell(npc.cell)
+		if not npc.is_walker:
+			_map.block_cell(npc.cell)
 		npcs.append(npc)
 		_by_id[npc.id] = npc
 

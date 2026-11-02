@@ -49,12 +49,12 @@ const PROPS := {
 	},
 	"house": {
 		"scene": "res://scenes/props/house.tscn",
-		# Ground-floor footprint (the base, not the roof or the stairs): shifted
-		# left because the house body sits left of its sprite centre.
+		# Footprint matching the 3D house model (~3.2 x 4.8 units).
 		"footprint": [
-			Vector2i(-2, -1), Vector2i(-2, 0),
-			Vector2i(-1, -2), Vector2i(-1, -1), Vector2i(-1, 0),
-			Vector2i(0, -1),
+			Vector2i(-1, -2), Vector2i(0, -2), Vector2i(1, -2),
+			Vector2i(-1, -1), Vector2i(0, -1), Vector2i(1, -1),
+			Vector2i(-1, 0), Vector2i(0, 0), Vector2i(1, 0),
+			Vector2i(-1, 1), Vector2i(0, 1), Vector2i(1, 1),
 		],
 	},
 }

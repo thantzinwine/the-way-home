@@ -1,27 +1,28 @@
 [gd_scene load_steps=4 format=3]
 
-[ext_resource type="Texture2D" path="res://assets/environments/props/tree_placeholder.png" id="1_texture"]
-[ext_resource type="Texture2D" path="res://assets/environments/shadow_placeholder.png" id="2_shadow"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_trunk"]
+top_radius = 0.1
+bottom_radius = 0.15
+height = 2.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_tree"]
-radius = 10.0
+[sub_resource type="SphereMesh" id="SphereMesh_canopy"]
+radius = 1.0
+height = 2.0
 
-[node name="Tree" type="Node2D"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_trunk"]
+albedo_color = Color(0.4, 0.25, 0.15, 1)
 
-[node name="Shadow" type="Sprite2D" parent="."]
-position = Vector2(0, -4)
-scale = Vector2(0.95, 0.9)
-texture = ExtResource("2_shadow")
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_canopy"]
+albedo_color = Color(0.2, 0.5, 0.25, 1)
 
-[node name="Sprite" type="Sprite2D" parent="."]
-texture = ExtResource("1_texture")
-centered = false
-offset = Vector2(-36, -104)
+[node name="Tree" type="StaticBody3D"]
 
-[node name="Body" type="StaticBody2D" parent="."]
-collision_layer = 1
-collision_mask = 0
+[node name="Trunk" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_trunk")
+material_override = SubResource("StandardMaterial3D_trunk")
+position = Vector3(0, 1.0, 0)
 
-[node name="Collision" type="CollisionShape2D" parent="Body"]
-position = Vector2(0, -8)
-shape = SubResource("CircleShape2D_tree")
+[node name="Canopy" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_canopy")
+material_override = SubResource("StandardMaterial3D_canopy")
+position = Vector3(0, 2.5, 0)

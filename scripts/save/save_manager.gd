@@ -12,7 +12,7 @@ const PHOTO_DIR := "user://photos/"
 
 @export var main_path: NodePath
 
-var main: Node2D
+var main: Node3D
 var player: PlayerRen
 var map: MapBuilder
 var steps: StepsWallet
@@ -21,7 +21,7 @@ var photos: PhotoManager
 
 
 func _ready() -> void:
-	main = get_node_or_null(main_path) as Node2D
+	main = get_node_or_null(main_path) as Node3D
 	if main == null:
 		return
 	player = main.get_node_or_null("World/Ren") as PlayerRen

@@ -1,14 +1,8 @@
-## Builds the playable map from a plain-text layout.
-##
-## Why text: the tilemap data lives in version control as something a designer can
-## read and edit, and the map can be rebuilt against new artwork at any time.
-## The scene only needs an empty TileMapLayer and a parent for the props.
+## Builds the playable map from a plain-text layout (3D).
 class_name MapBuilder
-extends Node2D
+extends Node3D
 
 signal built
-
-const PROP_OCCLUDER := preload("res://scripts/props/prop_occluder.gd")
 
 @export_file("*.txt") var map_file := "res://data/maps/test_neighborhood.txt"
 @export var ground_path: NodePath
@@ -20,14 +14,15 @@ var start_cell := Vector2i(2, 11)
 var width := 0
 var height := 0
 
-var _ground: TileMapLayer
-var _props_parent: Node
+var _ground: Node3D
+var _props_parent: Node3D
 var _blocked := {}
 var _built := false
 var _map_rows: Array[String] = []
 var _prop_rows: Array[String] = []
 var _prop_count := 0
 var _props: Array[Node] = []
+var _tile_walkable := {}
 
 
 func _ready() -> void:
@@ -38,27 +33,18 @@ func _ready() -> void:
 func build() -> void:
 	if _built:
 		return
-
-	_ground = get_node_or_null(ground_path) as TileMapLayer
-	_props_parent = get_node_or_null(props_parent_path)
-	if _ground == null:
-		push_error("MapBuilder: ground_path does not point at a TileMapLayer")
+	_ground = get_node_or_null(ground_path) as Node3D
+	_props_parent = get_node_or_null(props_parent_path) as Node3D
+	if _ground == null or _props_parent == null:
+		push_error("MapBuilder: paths not set")
 		return
-	if _props_parent == null:
-		push_error("MapBuilder: props_parent_path does not point at a Node")
-		return
-	if tileset != null:
-		_ground.tile_set = tileset
-
 	var text := FileAccess.get_file_as_string(map_file)
 	if text.is_empty():
 		push_error("MapBuilder: could not read %s" % map_file)
 		return
-
 	_parse(text)
 	_build_tiles()
 	_build_props()
-
 	_built = true
 	built.emit()
 
@@ -68,20 +54,15 @@ func is_walkable(cell: Vector2i) -> bool:
 		return false
 	if _blocked.has(cell):
 		return false
-	if _ground == null:
+	if not _tile_walkable.has(cell):
 		return false
-	var data := _ground.get_cell_tile_data(cell)
-	if data == null:
-		return false
-	return bool(data.get_custom_data("walkable"))
+	return bool(_tile_walkable[cell])
 
 
-## Blocks a cell at runtime (used by NPC placement). Does not remove tiles.
 func block_cell(cell: Vector2i) -> void:
 	_blocked[cell] = true
 
 
-## World-space bounds of the map, used for the camera limits.
 func get_world_rect() -> Rect2:
 	if width == 0 or height == 0:
 		return Rect2()
@@ -93,18 +74,15 @@ func get_world_rect() -> Rect2:
 	]
 	var min_x: float = corners[0].x
 	var max_x: float = corners[0].x
-	var min_y: float = corners[0].y
-	var max_y: float = corners[0].y
+	var min_z: float = corners[0].z
+	var max_z: float = corners[0].z
 	for c in corners:
 		min_x = minf(min_x, c.x)
 		max_x = maxf(max_x, c.x)
-		min_y = minf(min_y, c.y)
-		max_y = maxf(max_y, c.y)
-	const MARGIN := 160.0
-	return Rect2(
-		Vector2(min_x - MARGIN, min_y - MARGIN),
-		Vector2((max_x - min_x) + MARGIN * 2.0, (max_y - min_y) + MARGIN * 2.0)
-	)
+		min_z = minf(min_z, c.z)
+		max_z = maxf(max_z, c.z)
+	const MARGIN := 2.0
+	return Rect2(Vector2(min_x - MARGIN, min_z - MARGIN), Vector2((max_x - min_x) + MARGIN * 2.0, (max_z - min_z) + MARGIN * 2.0))
 
 
 func get_prop_count() -> int:
@@ -119,15 +97,22 @@ func get_blocked_cells() -> Dictionary:
 	return _blocked
 
 
-# --- internals -----------------------------------------------------------------
+func _tile_color(glyph: String) -> Color:
+	match glyph:
+		".": return Color(0.35, 0.55, 0.30)
+		",": return Color(0.40, 0.60, 0.32)
+		"-": return Color(0.55, 0.45, 0.30)
+		"_": return Color(0.60, 0.60, 0.55)
+		"=": return Color(0.30, 0.30, 0.32)
+		"x": return Color(0.45, 0.45, 0.40)
+		"#": return Color(0.40, 0.38, 0.36)
+		"~": return Color(0.25, 0.40, 0.60)
+		_: return Color(0.35, 0.55, 0.30)
 
-func _attach_occluder(instance: Node) -> void:
-	var sprite := instance.get_node_or_null("Sprite") as Sprite2D
-	if sprite == null:
-		return
-	var occluder := PROP_OCCLUDER.new()
-	instance.add_child(occluder)
-	occluder.setup(sprite)
+
+func _tile_walkable_glyph(glyph: String) -> bool:
+	return glyph != "#" and glyph != "~"
+
 
 func _parse(text: String) -> void:
 	var section := ""
@@ -135,7 +120,6 @@ func _parse(text: String) -> void:
 		var line := raw_line.strip_edges()
 		if line.is_empty() or line.begins_with("//"):
 			continue
-
 		if line.begins_with("START"):
 			var parts := line.split(" ", false)
 			if parts.size() >= 2:
@@ -149,7 +133,6 @@ func _parse(text: String) -> void:
 		if line == "PROPS":
 			section = "props"
 			continue
-
 		match section:
 			"map":
 				_map_rows.append(line)
@@ -157,8 +140,7 @@ func _parse(text: String) -> void:
 			"props":
 				_prop_rows.append(line)
 			_:
-				push_warning("MapBuilder: text outside of a MAP/PROPS section: %s" % line)
-
+				pass
 	height = _map_rows.size()
 
 
@@ -167,8 +149,17 @@ func _build_tiles() -> void:
 		var row: String = _map_rows[y]
 		for x in row.length():
 			var glyph := row[x]
-			if TileLegend.has_glyph(glyph):
-				_ground.set_cell(Vector2i(x, y), 0, TileLegend.atlas_coords(glyph))
+			var cell := Vector2i(x, y)
+			_tile_walkable[cell] = _tile_walkable_glyph(glyph)
+			var mi := MeshInstance3D.new()
+			var pm := PlaneMesh.new()
+			pm.size = Vector2(1.0, 1.0)
+			mi.mesh = pm
+			var mat := StandardMaterial3D.new()
+			mat.albedo_color = _tile_color(glyph)
+			mi.material_override = mat
+			mi.position = Isometric.grid_to_world(cell)
+			_ground.add_child(mi)
 
 
 func _build_props() -> void:
@@ -179,19 +170,14 @@ func _build_props() -> void:
 			var prop_id := PropLibrary.prop_id_for(glyph)
 			if prop_id.is_empty():
 				continue
-
 			var scene := PropLibrary.scene_for(prop_id)
 			if scene == null:
-				push_warning("MapBuilder: no scene registered for '%s'" % prop_id)
 				continue
-
 			var cell := Vector2i(x, y)
 			var instance := scene.instantiate()
 			instance.position = Isometric.grid_to_world(cell)
 			_props_parent.add_child(instance)
 			_prop_count += 1
-			_attach_occluder(instance)
 			_props.append(instance)
-
 			for offset in PropLibrary.footprint_for(prop_id):
 				_blocked[cell + offset] = true
